@@ -56,7 +56,7 @@ def normalize_sixteen_bit(data, max_value):
 def create_window():
     """Return draw function, which takes a image filename parameter."""
     pygame.init()
-    pygame.key.set_repeat(75)
+    pygame.key.set_repeat(200)
 
     surface = [None]
 
