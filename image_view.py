@@ -105,9 +105,11 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     break
-                elif event.key in [pygame.K_LEFT, pygame.K_UP]:
+                elif event.key in [pygame.K_LEFT, pygame.K_UP,
+                                   pygame.K_BACKSPACE]:
                     index = max(0, index - 1)
-                elif event.key in [pygame.K_RIGHT, pygame.K_DOWN]:
+                elif event.key in [pygame.K_RIGHT, pygame.K_DOWN,
+                                   pygame.K_SPACE]:
                     index = min(len(args.files) - 1, index + 1)
 
                 draw(args.files[index])
