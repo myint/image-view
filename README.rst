@@ -9,6 +9,16 @@ from camera (``captured-00*.pgm``) and you want to display some subset of them.
 
 .. _Xee: https://code.google.com/p/xee/
 
+
+Installation
+============
+
+::
+
+    $ pip install --upgrade git+https://github.com/myint/pygame
+    $ pip install --upgrade image-view
+
+
 Usage
 =====
 
