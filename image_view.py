@@ -5,6 +5,7 @@
 from __future__ import division
 
 import argparse
+import os
 import sys
 
 import pygame
@@ -13,6 +14,9 @@ import pygame.font
 
 
 __version__ = '0.1'
+
+
+BACKGROUND = (146, 146, 146)
 
 
 def create_window():
@@ -24,15 +28,18 @@ def create_window():
     def draw(surface, image_filename):
         """Draw image."""
         image_surface = pygame.image.load(image_filename)
+        image_size = image_surface.get_size()
 
         pygame.display.set_caption('{} {}'.format(
-            image_filename,
-            image_surface.get_size()))
+            os.path.basename(image_filename),
+            image_size))
 
         if not surface[0]:
-            surface[0] = pygame.display.set_mode(image_surface.get_size())
+            surface[0] = pygame.display.set_mode(
+                (max(256, image_size[0]),
+                 max(256, image_size[0])))
 
-        surface[0].fill(pygame.colordict.THECOLORS['white'])
+        surface[0].fill(BACKGROUND)
         surface[0].blit(image_surface, (0, 0))
 
         pygame.display.flip()
