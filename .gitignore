@@ -1,0 +1,12 @@
+.*.swp
+*.pyc
+MANIFEST
+README.html
+__pycache__/
+.tox/
+.travis-solo/
+build/
+dist/
+htmlcov/
+*.egg*/
+.coverage
