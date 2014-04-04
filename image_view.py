@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import array
 import argparse
 import os
 import sys
@@ -18,6 +19,40 @@ __version__ = '0.2'
 BACKGROUND = (146, 146, 146)
 
 
+def load_pgm(filename):
+    """Load PGM and return pygame.Surface."""
+    with open(filename, mode='rb') as input_file:
+        magic_id = input_file.readline().strip()
+
+        line = b'#'
+        while line.startswith(b'#'):
+            line = input_file.readline().strip()
+
+        size = [int(value) for value in line.split()]
+
+        if magic_id == b'P5':
+            max_value = int(input_file.readline().strip())
+
+            byte_array = array.array('H')
+            byte_array.fromfile(input_file, size[0] * size[1])
+
+            data = bytes(normalize_sixteen_bit(byte_array, max_value))
+        else:
+            raise SystemExit(
+                'For 16-bit images, only binary PGMs are currently supported')
+
+    return pygame.image.frombuffer(data, size, 'RGB')
+
+
+def normalize_sixteen_bit(data, max_value):
+    """Return 8-bit normalized integers."""
+    for value in data:
+        normalized = 255 * value // max_value
+        yield normalized
+        yield normalized
+        yield normalized
+
+
 def create_window():
     """Return draw function, which takes a image filename parameter."""
     pygame.init()
@@ -27,7 +62,10 @@ def create_window():
 
     def draw(surface, image_filename):
         """Draw image."""
-        image_surface = pygame.image.load(image_filename)
+        try:
+            image_surface = pygame.image.load(image_filename)
+        except pygame.error:
+            image_surface = load_pgm(image_filename)
 
         pygame.display.set_caption(os.path.basename(image_filename))
 
