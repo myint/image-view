@@ -60,11 +60,10 @@ def main():
 
             if event.type == pygame.QUIT:
                 break
-            if event.type == pygame.KEYUP:
+            elif event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     break
-            elif event.type == pygame.KEYDOWN:
-                if not filename_stack:
+                elif not filename_stack:
                     break
                 draw(filename_stack.pop())
     except KeyboardInterrupt:
