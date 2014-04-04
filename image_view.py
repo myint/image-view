@@ -20,6 +20,7 @@ BACKGROUND = (146, 146, 146)
 def create_window():
     """Return draw function, which takes a image filename parameter."""
     pygame.init()
+    pygame.key.set_repeat(75)
 
     surface = [None]
 
