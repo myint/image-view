@@ -26,16 +26,13 @@ def create_window():
     def draw(surface, image_filename):
         """Draw image."""
         image_surface = pygame.image.load(image_filename)
-        image_size = image_surface.get_size()
 
-        pygame.display.set_caption('{} {}'.format(
-            os.path.basename(image_filename),
-            image_size))
+        pygame.display.set_caption(os.path.basename(image_filename))
 
         if not surface[0]:
             surface[0] = pygame.display.set_mode(
-                (max(256, image_size[0]),
-                 max(256, image_size[0])))
+                (max(512, image_surface.get_size()[0]),
+                 max(256, image_surface.get_size()[1])))
 
         surface[0].fill(BACKGROUND)
         surface[0].blit(image_surface, (0, 0))
@@ -54,11 +51,11 @@ def main():
                         help='paths to images')
     args = parser.parse_args()
 
-    filename_stack = list(reversed(args.files))
+    index = 0
 
     try:
         draw = create_window()
-        draw(filename_stack.pop())
+        draw(args.files[index])
 
         while True:
             event = pygame.event.wait()
@@ -68,9 +65,12 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     break
-                elif not filename_stack:
-                    break
-                draw(filename_stack.pop())
+                elif event.key in [pygame.K_LEFT, pygame.K_UP]:
+                    index = max(0, index - 1)
+                elif event.key in [pygame.K_RIGHT, pygame.K_DOWN]:
+                    index = min(len(args.files) - 1, index + 1)
+
+                draw(args.files[index])
     except KeyboardInterrupt:
         pass
 

@@ -25,3 +25,5 @@ Usage
 ::
 
     $ image-view captured-070*.pgm
+
+Use the left and right arrow keys to navigate through images.
