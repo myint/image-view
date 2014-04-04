@@ -9,8 +9,6 @@ import os
 import sys
 
 import pygame
-import pygame.colordict
-import pygame.font
 
 
 __version__ = '0.1'
