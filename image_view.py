@@ -4,11 +4,15 @@
 
 from __future__ import division
 
+import argparse
 import sys
 
 import pygame
 import pygame.colordict
 import pygame.font
+
+
+__version__ = '0.1'
 
 
 def create_window():
@@ -34,7 +38,14 @@ def create_window():
 
 def main():
     """Entry point."""
-    filename_stack = list(reversed(sys.argv[1:]))
+    parser = argparse.ArgumentParser(prog='image-view')
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s ' + __version__)
+    parser.add_argument('files', nargs='+',
+                        help='paths to images')
+    args = parser.parse_args()
+
+    filename_stack = list(reversed(args.files))
 
     try:
         draw = create_window()
@@ -55,5 +66,6 @@ def main():
     except KeyboardInterrupt:
         pass
 
+
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
