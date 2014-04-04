@@ -19,21 +19,25 @@ def create_window():
     """Return draw function, which takes a image filename parameter."""
     pygame.init()
 
-    resolution = [size // 2 for size in pygame.display.list_modes()[0]]
-    surface = pygame.display.set_mode(resolution)
+    surface = [None]
 
-    def draw(image_filename):
+    def draw(surface, image_filename):
         """Draw image."""
         image_surface = pygame.image.load(image_filename)
+
         pygame.display.set_caption('{} {}'.format(
             image_filename,
             image_surface.get_size()))
-        surface.fill(pygame.colordict.THECOLORS['white'])
-        surface.blit(image_surface, (0, 0))
+
+        if not surface[0]:
+            surface[0] = pygame.display.set_mode(image_surface.get_size())
+
+        surface[0].fill(pygame.colordict.THECOLORS['white'])
+        surface[0].blit(image_surface, (0, 0))
 
         pygame.display.flip()
 
-    return draw
+    return lambda filename: draw(surface, filename)
 
 
 def main():
