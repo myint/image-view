@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""image-view."""
+"""Image viewer."""
 
 from __future__ import absolute_import
 from __future__ import division

@@ -2,7 +2,7 @@
 image-view
 ==========
 
-``image-view`` displays images using ``pygame``.
+``image-view`` displays images (PNM, PNG, JPEG, etc.) using ``pygame``.
 
 The primary motivation is to support viewing Netpbm images on OS X. For common
 image types, Preview works great. For Netpbm images Xee_ works fine for the

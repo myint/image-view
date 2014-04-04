@@ -17,8 +17,8 @@ def version():
 with open('README.rst') as readme:
     setup(name='image-view',
           version=version(),
-          description='Displays Netpbm images conveniently on OS X from the '
-                      'terminal.',
+          description='Displays images (PNM, PNG, JPEG, etc.) conveniently '
+                      'from the terminal.',
           long_description=readme.read(),
           license='Expat License',
           author='Steven Myint',
