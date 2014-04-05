@@ -80,7 +80,12 @@ def normalize_sixteen_bit(data, max_value):
 
 
 def create_window():
-    """Return draw function, which takes a image filename parameter."""
+    """Return draw function, which takes a image filename parameter.
+
+    >>> draw = create_window()
+    >>> draw('test/16_bit_ascii.pgm')
+
+    """
     pygame.init()
     pygame.key.set_repeat(200)
 

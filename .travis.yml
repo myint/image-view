@@ -1,5 +1,8 @@
 language: cpp
 
+env:
+    - SDL_VIDEODRIVER=dummy
+
 before_install:
     - sudo apt-get update --quiet=2
     - sudo apt-get install --quiet=2 python-pygame
