@@ -30,7 +30,13 @@ def load_pgm(filename):
 
         size = [int(value) for value in line.split()]
 
-        if magic_id == b'P5':
+        if magic_id == b'P2':
+            max_value = int(input_file.readline().strip())
+
+            byte_array = [int(value) for value in input_file.read().split()]
+
+            data = bytes(normalize_sixteen_bit(byte_array, max_value))
+        elif magic_id == b'P5':
             max_value = int(input_file.readline().strip())
 
             byte_array = array.array('H')
