@@ -25,6 +25,19 @@ def load_pgm(filename):
     This is only needed for 16-bit Netpbm formats, which pygame does not
     support.
 
+    >>> pgm0 = load_pgm('test/16_bit_ascii.pgm')
+    >>> pgm0.get_size()
+    (24, 7)
+
+    >>> pgm1 = load_pgm('test/16_bit_ascii_without_comments.pgm')
+    >>> (pygame.image.tostring(pgm0, 'RGB') ==
+    ...  pygame.image.tostring(pgm1, 'RGB'))
+    True
+
+    >>> pgm_binary = load_pgm('test/16_bit_binary.pgm')
+    >>> pgm_binary.get_size()
+    (32, 16)
+
     """
     with open(filename, mode='rb') as input_file:
         magic_id = input_file.readline().strip()[:2]
@@ -40,14 +53,14 @@ def load_pgm(filename):
 
             byte_array = [int(value) for value in input_file.read().split()]
 
-            data = bytes(normalize_sixteen_bit(byte_array, max_value))
+            data = bytearray(normalize_sixteen_bit(byte_array, max_value))
         elif magic_id == b'P5':
             max_value = int(input_file.readline().strip())
 
             byte_array = array.array('H')
             byte_array.fromfile(input_file, size[0] * size[1])
 
-            data = bytes(normalize_sixteen_bit(byte_array, max_value))
+            data = bytearray(normalize_sixteen_bit(byte_array, max_value))
         else:
             raise SystemExit(
                 "'{}' is of of an unsupported image type ({})".format(

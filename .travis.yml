@@ -1,0 +1,12 @@
+language: cpp
+
+before_install:
+    - sudo apt-get update --quiet=2
+    - sudo apt-get install --quiet=2 python-pygame
+
+install:
+    - sudo python setup.py --quiet install
+
+script:
+    - python -m doctest -v image_view.py
+    - image-view --help
