@@ -20,7 +20,12 @@ BACKGROUND = (146, 146, 146)
 
 
 def load_pgm(filename):
-    """Load PGM and return pygame.Surface."""
+    """Load PGM and return pygame.Surface.
+
+    This is only needed for 16-bit Netpbm formats, which pygame does not
+    support.
+
+    """
     with open(filename, mode='rb') as input_file:
         magic_id = input_file.readline().strip()[:2]
 
