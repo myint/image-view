@@ -59,18 +59,15 @@ def load_pgm(filename):
 
     if magic_id == b'P2':
         byte_array = [int(value) for value in raw_data.split()]
-
-        data = bytearray(normalize_sixteen_bit(byte_array, max_value))
     elif magic_id == b'P5':
         byte_array = array.array('H')
         byte_array.fromstring(raw_data)
-
-        data = bytearray(normalize_sixteen_bit(byte_array, max_value))
     else:
         # This cannot happen since we would have raised an exception on not
         # matching the regular expression.
         assert False
 
+    data = bytearray(normalize_sixteen_bit(byte_array, max_value))
     return pygame.image.frombuffer(data, size, 'RGB')
 
 
