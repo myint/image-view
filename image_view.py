@@ -8,6 +8,7 @@ from __future__ import division
 import array
 import argparse
 import os
+import re
 import signal
 import sys
 
@@ -18,6 +19,8 @@ __version__ = '0.3.1'
 
 
 BACKGROUND = (146, 146, 146)
+MAGIC_REGEX = br'\s*(P[25])\s*(?:#.*[\r\n])*'
+NUMBER_REGEX = br'\s*(\d+)\s*(?:#.*[\r\n])*'
 
 
 def load_pgm(filename):
@@ -41,31 +44,32 @@ def load_pgm(filename):
 
     """
     with open(filename, mode='rb') as input_file:
-        magic_id = input_file.readline().strip()[:2]
+        file_contents = input_file.read()
 
-        line = b'#'
-        while line.startswith(b'#'):
-            line = input_file.readline().strip()
+    result = re.search(MAGIC_REGEX + 3 * NUMBER_REGEX,
+                       file_contents)
+    if not result:
+        raise SystemExit(
+            "'{}' is of of an unsupported image type".format(filename))
 
-        size = [int(value) for value in line.split()]
+    magic_id = result.group(1)
+    size = (int(result.group(2)), int(result.group(3)))
+    max_value = int(result.group(4))
+    raw_data = file_contents[result.end():]
 
-        if magic_id == b'P2':
-            max_value = int(input_file.readline().strip())
+    if magic_id == b'P2':
+        byte_array = [int(value) for value in raw_data.split()]
 
-            byte_array = [int(value) for value in input_file.read().split()]
+        data = bytearray(normalize_sixteen_bit(byte_array, max_value))
+    elif magic_id == b'P5':
+        byte_array = array.array('H')
+        byte_array.fromstring(raw_data)
 
-            data = bytearray(normalize_sixteen_bit(byte_array, max_value))
-        elif magic_id == b'P5':
-            max_value = int(input_file.readline().strip())
-
-            byte_array = array.array('H')
-            byte_array.fromfile(input_file, size[0] * size[1])
-
-            data = bytearray(normalize_sixteen_bit(byte_array, max_value))
-        else:
-            raise SystemExit(
-                "'{}' is of of an unsupported image type ({})".format(
-                    filename, magic_id))
+        data = bytearray(normalize_sixteen_bit(byte_array, max_value))
+    else:
+        raise SystemExit(
+            "'{}' is of of an unsupported image type ({})".format(
+                filename, magic_id))
 
     return pygame.image.frombuffer(data, size, 'RGB')
 
