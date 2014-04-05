@@ -15,7 +15,7 @@ import sys
 import pygame
 
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 
 BACKGROUND = (146, 146, 146)
