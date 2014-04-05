@@ -61,7 +61,8 @@ def load_pgm(filename):
         byte_array = [int(value) for value in raw_data.split()]
     elif magic_id == b'P5':
         byte_array = array.array('H')
-        byte_array.fromstring(raw_data)
+        # Ignore any junk at the end of the file.
+        byte_array.fromstring(raw_data[:2 * size[0] * size[1]])
     else:
         # This cannot happen since we would have raised an exception on not
         # matching the regular expression.
