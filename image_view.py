@@ -86,7 +86,7 @@ def create_window():
     >>> draw('test/16_bit_ascii.pgm')
 
     """
-    pygame.init()
+    pygame.display.init()
     pygame.key.set_repeat(200)
 
     surface = [None]
