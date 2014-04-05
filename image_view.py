@@ -22,7 +22,7 @@ BACKGROUND = (146, 146, 146)
 def load_pgm(filename):
     """Load PGM and return pygame.Surface."""
     with open(filename, mode='rb') as input_file:
-        magic_id = input_file.readline().strip()
+        magic_id = input_file.readline().strip()[:2]
 
         line = b'#'
         while line.startswith(b'#'):
@@ -39,7 +39,8 @@ def load_pgm(filename):
             data = bytes(normalize_sixteen_bit(byte_array, max_value))
         else:
             raise SystemExit(
-                'For 16-bit images, only binary PGMs are currently supported')
+                "'{}' is of of an unsupported image type ({})".format(
+                    filename, magic_id))
 
     return pygame.image.frombuffer(data, size, 'RGB')
 
