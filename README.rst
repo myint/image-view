@@ -2,6 +2,10 @@
 image-view
 ==========
 
+.. image:: https://travis-ci.org/myint/image-view.png?branch=master
+    :target: https://travis-ci.org/myint/image-view
+    :alt: Build status
+
 ``image-view`` displays images (PNM, PNG, JPEG, etc.) using ``pygame``.
 
 The primary motivation is to support viewing Netpbm images on OS X. For common
