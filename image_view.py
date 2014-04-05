@@ -67,9 +67,9 @@ def load_pgm(filename):
 
         data = bytearray(normalize_sixteen_bit(byte_array, max_value))
     else:
-        raise SystemExit(
-            "'{}' is of of an unsupported image type ({})".format(
-                filename, magic_id))
+        # This cannot happen since we would have raised an exception on not
+        # matching the regular expression.
+        assert False
 
     return pygame.image.frombuffer(data, size, 'RGB')
 
