@@ -8,6 +8,7 @@ from __future__ import division
 import array
 import argparse
 import os
+import signal
 import sys
 
 import pygame
@@ -107,6 +108,31 @@ def create_window():
     return lambda filename: draw(surface, filename)
 
 
+def run_user_interface(args):
+    """Launch the pygame-based image viewing interface."""
+    index = 0
+
+    draw = create_window()
+    draw(args.files[index])
+
+    while True:
+        event = pygame.event.wait()
+
+        if event.type == pygame.QUIT:
+            break
+        elif event.type == pygame.KEYDOWN:
+            if event.key in [pygame.K_ESCAPE, pygame.K_q]:
+                break
+            elif event.key in [pygame.K_LEFT, pygame.K_UP,
+                               pygame.K_BACKSPACE]:
+                index = max(0, index - 1)
+            elif event.key in [pygame.K_RIGHT, pygame.K_DOWN,
+                               pygame.K_SPACE]:
+                index = min(len(args.files) - 1, index + 1)
+
+            draw(args.files[index])
+
+
 def main():
     """Entry point."""
     parser = argparse.ArgumentParser(prog='image-view')
@@ -116,30 +142,11 @@ def main():
                         help='paths to images')
     args = parser.parse_args()
 
-    index = 0
+    # This is necessary because somehow pygame (at least on OS X) interferes
+    # with the raising of KeyboardInterrupt.
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    try:
-        draw = create_window()
-        draw(args.files[index])
-
-        while True:
-            event = pygame.event.wait()
-
-            if event.type == pygame.QUIT:
-                break
-            elif event.type == pygame.KEYDOWN:
-                if event.key in [pygame.K_ESCAPE, pygame.K_q]:
-                    break
-                elif event.key in [pygame.K_LEFT, pygame.K_UP,
-                                   pygame.K_BACKSPACE]:
-                    index = max(0, index - 1)
-                elif event.key in [pygame.K_RIGHT, pygame.K_DOWN,
-                                   pygame.K_SPACE]:
-                    index = min(len(args.files) - 1, index + 1)
-
-                draw(args.files[index])
-    except KeyboardInterrupt:
-        pass
+    run_user_interface(args)
 
 
 if __name__ == '__main__':
