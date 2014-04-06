@@ -1,0 +1,7 @@
+include *.bash
+recursive-include test *.pgm
+recursive-include test *.png
+
+exclude *.png
+exclude .travis.yml
+exclude Makefile
