@@ -81,52 +81,68 @@ def normalize_sixteen_bit(data, max_value):
         yield normalized
 
 
-def create_window():
+class Viewer(object):
+
     """Return draw function, which takes a image filename parameter.
 
-    >>> draw = create_window()
-    >>> draw('test/16_bit_ascii.pgm')
+    >>> viewer = Viewer()
+    >>> viewer.draw('test/16_bit_ascii.pgm')
 
     """
-    pygame.display.init()
-    pygame.key.set_repeat(200)
 
-    surface = [None]
+    def __init__(self):
+        pygame.display.init()
+        pygame.key.set_repeat(200)
 
-    def draw(surface, image_filename):
+        self.__surface = None
+        self.__image_surface = None
+
+    def draw(self, image_filename):
         """Draw image."""
-        try:
-            image_surface = pygame.image.load(image_filename)
-        except pygame.error:
-            image_surface = load_pgm(image_filename)
+        if image_filename:
+            try:
+                self.__image_surface = pygame.image.load(image_filename)
+            except pygame.error:
+                self.__image_surface = load_pgm(image_filename)
 
-        pygame.display.set_caption(os.path.basename(image_filename))
+            pygame.display.set_caption(os.path.basename(image_filename))
 
-        if not surface[0]:
-            surface[0] = pygame.display.set_mode(
-                (max(512, image_surface.get_size()[0]),
-                 max(256, image_surface.get_size()[1])))
+        if self.__image_surface:
+            if not self.__surface:
+                self.__surface = pygame.display.set_mode(
+                    (max(512, self.__image_surface.get_size()[0]),
+                     max(256, self.__image_surface.get_size()[1])),
+                    pygame.RESIZABLE)
 
-        surface[0].fill(BACKGROUND)
-        surface[0].blit(image_surface, (0, 0))
+        self._draw()
 
+    def _draw(self):
+        """Draw contents of window."""
+        self.__surface.fill(BACKGROUND)
+        if self.__image_surface:
+            self.__surface.blit(self.__image_surface, (0, 0))
         pygame.display.flip()
 
-    return lambda filename: draw(surface, filename)
+    def resize(self, size):
+        """Resize the window."""
+        self.__surface = pygame.display.set_mode(size, pygame.RESIZABLE)
+        self._draw()
 
 
 def run_user_interface(args):
     """Launch the pygame-based image viewing interface."""
     index = 0
 
-    draw = create_window()
-    draw(args.files[index])
+    viewer = Viewer()
+    viewer.draw(args.files[index])
 
     while True:
         event = pygame.event.wait()
 
         if event.type == pygame.QUIT:
             break
+        elif event.type == pygame.VIDEORESIZE:
+            viewer.resize(event.dict['size'])
         elif event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                 break
@@ -137,7 +153,7 @@ def run_user_interface(args):
                                pygame.K_SPACE]:
                 index = min(len(args.files) - 1, index + 1)
 
-            draw(args.files[index])
+            viewer.draw(args.files[index])
 
 
 def main():
