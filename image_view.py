@@ -59,7 +59,7 @@ def rainbow_gradient(data, max_value):
         yield b
 
 
-def load_pgm(filename, rgb_mapper=grayscale_gradient):
+def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     """Load PGM and return pygame.Surface.
 
     This is only needed for 16-bit Netpbm formats, which pygame does not
@@ -76,7 +76,7 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient):
 
     >>> pgm_binary = load_pgm('test/16_bit_binary.pgm')
     >>> pgm_binary.get_size()
-    (32, 16)
+    (20, 100)
 
     """
     with open(filename, mode='rb') as input_file:
@@ -99,6 +99,9 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient):
         byte_array = array.array('H')
         # Ignore any junk at the end of the file.
         byte_array.fromstring(raw_data[:2 * size[0] * size[1]])
+
+        if sys.byteorder == 'little' and big_endian:
+            byte_array.byteswap()
     else:
         # This cannot happen since we would have raised an exception on not
         # matching the regular expression.
@@ -117,7 +120,7 @@ class Viewer(object):
 
     """
 
-    def __init__(self, colorize=False):
+    def __init__(self, colorize=False, big_endian=True):
         pygame.display.init()
         pygame.key.set_repeat(200)
 
@@ -125,6 +128,7 @@ class Viewer(object):
         self.__image_surface = None
         self.__rgb_mapper = (
             rainbow_gradient if colorize else grayscale_gradient)
+        self.__big_endian = big_endian
 
     def draw(self, image_filename):
         """Draw image."""
@@ -133,7 +137,8 @@ class Viewer(object):
                 self.__image_surface = pygame.image.load(image_filename)
             except pygame.error:
                 self.__image_surface = load_pgm(image_filename,
-                                                rgb_mapper=self.__rgb_mapper)
+                                                rgb_mapper=self.__rgb_mapper,
+                                                big_endian=self.__big_endian)
 
             pygame.display.set_caption(os.path.basename(image_filename))
 
@@ -163,7 +168,8 @@ def run_user_interface(args):
     """Launch the pygame-based image viewing interface."""
     index = 0
 
-    viewer = Viewer(colorize=args.colorize)
+    viewer = Viewer(colorize=args.colorize,
+                    big_endian=not args.little_endian)
     viewer.draw(args.files[index])
 
     while True:
@@ -191,6 +197,9 @@ def main():
     parser = argparse.ArgumentParser(prog='image-view')
     parser.add_argument('--colorize', action='store_true',
                         help='color 16-bit PGM images with a rainbow gradient')
+    parser.add_argument('--little-endian', action='store_true',
+                        help='interpret 16-bit PGM images as little endian; '
+                             'this the opposite of Netpbm (and ImageMagick)')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
