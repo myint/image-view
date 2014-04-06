@@ -20,9 +20,13 @@ camera (``captured-00*.pgm``), and you want to display a subset of them.
 Installation
 ============
 
-::
+First install the ``pygame`` dependency somehow. One option is to use this
+fork, which avoids X11 on OS X::
 
     $ pip install --upgrade git+https://github.com/myint/pygame
+
+Then install the actual program::
+
     $ pip install --upgrade image-view
 
 
