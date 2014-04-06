@@ -23,7 +23,43 @@ MAGIC_REGEX = br'\s*(P[25])\s*(?:#.*[\r\n])*'
 NUMBER_REGEX = br'\s*(\d+)\s*(?:#.*[\r\n])*'
 
 
-def load_pgm(filename):
+def grayscale_gradient(data, max_value):
+    """Return 8-bit normalized RGB integers.
+
+    >>> list(grayscale_gradient([1], 2))
+    [127, 127, 127]
+
+    """
+    for value in data:
+        normalized = 255 * value // max_value
+        yield normalized
+        yield normalized
+        yield normalized
+
+
+def rainbow_gradient(data, max_value):
+    """Return 8-bit normalized RGB integers.
+
+    >>> list(rainbow_gradient([0], 2))
+    [0, 0, 255]
+
+    >>> list(rainbow_gradient([1], 2))
+    [0, 255, 0]
+
+    >>> list(rainbow_gradient([2], 2))
+    [255, 0, 0]
+
+    """
+    for value in data:
+        middle = max_value / 2.
+        r = int(max(0, 255. * (value / middle - 1.)))
+        b = int(max(0, 255. * (1. - value / middle)))
+        yield r
+        yield 255 - b - r
+        yield b
+
+
+def load_pgm(filename, rgb_mapper=grayscale_gradient):
     """Load PGM and return pygame.Surface.
 
     This is only needed for 16-bit Netpbm formats, which pygame does not
@@ -68,17 +104,8 @@ def load_pgm(filename):
         # matching the regular expression.
         assert False
 
-    data = bytearray(normalize_sixteen_bit(byte_array, max_value))
+    data = bytearray(rgb_mapper(byte_array, max_value))
     return pygame.image.frombuffer(data, size, 'RGB')
-
-
-def normalize_sixteen_bit(data, max_value):
-    """Return 8-bit normalized integers."""
-    for value in data:
-        normalized = 255 * value // max_value
-        yield normalized
-        yield normalized
-        yield normalized
 
 
 class Viewer(object):
@@ -90,12 +117,14 @@ class Viewer(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, colorize=False):
         pygame.display.init()
         pygame.key.set_repeat(200)
 
         self.__surface = None
         self.__image_surface = None
+        self.__rgb_mapper = (
+            rainbow_gradient if colorize else grayscale_gradient)
 
     def draw(self, image_filename):
         """Draw image."""
@@ -103,7 +132,8 @@ class Viewer(object):
             try:
                 self.__image_surface = pygame.image.load(image_filename)
             except pygame.error:
-                self.__image_surface = load_pgm(image_filename)
+                self.__image_surface = load_pgm(image_filename,
+                                                rgb_mapper=self.__rgb_mapper)
 
             pygame.display.set_caption(os.path.basename(image_filename))
 
@@ -133,7 +163,7 @@ def run_user_interface(args):
     """Launch the pygame-based image viewing interface."""
     index = 0
 
-    viewer = Viewer()
+    viewer = Viewer(colorize=args.colorize)
     viewer.draw(args.files[index])
 
     while True:
@@ -159,6 +189,8 @@ def run_user_interface(args):
 def main():
     """Entry point."""
     parser = argparse.ArgumentParser(prog='image-view')
+    parser.add_argument('--colorize', action='store_true',
+                        help='color 16-bit PGM images with a rainbow gradient')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
