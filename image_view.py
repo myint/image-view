@@ -74,8 +74,8 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     ...  pygame.image.tostring(pgm1, 'RGB'))
     True
 
-    >>> pgm_binary = load_pgm('test/16_bit_binary.pgm')
-    >>> pgm_binary.get_size()
+    >>> pgm_binary0 = load_pgm('test/16_bit_binary.pgm')
+    >>> pgm_binary0.get_size()
     (20, 100)
 
     >>> load_pgm('test/8_bit_binary.pgm') is None
@@ -124,6 +124,14 @@ def load_image(filename, *args, **kwargs):
     >>> surface = load_image('test/python.png')
     >>> surface.get_size()
     (50, 65)
+
+    A 16-bit binary PGM should be nearly equivalent to its 8-bit counterpart.
+
+    >>> pgm_binary0 = load_image('test/16_bit_binary.pgm')
+    >>> pgm_binary1 = load_image('test/8_bit_binary.pgm')
+    >>> for j in range(pgm_binary0.get_height()):
+    ...     assert abs(pgm_binary0.get_at((0, j))[0] -
+    ...                pgm_binary1.get_at((0, j))[0]) <= 1
 
     """
     surface = load_pgm(filename, *args, **kwargs)
