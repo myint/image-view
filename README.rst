@@ -8,8 +8,8 @@ image-view
 
 ``image-view`` displays images (PNM, PNG, JPEG, etc.) using ``pygame``.
 
-The primary motivation is to support viewing Netpbm images on OS X. For common
-image types, Preview works great. For Netpbm images, Xee_ works fine for the
+The primary motivation is to support viewing PNM images on OS X. For common
+image types, Preview works great. For PNM images, Xee_ works fine for the
 most part, but it doesn't work properly when displaying a subset of images from
 command line. This is important if there are a series of images captured from a
 camera (``captured-00*.pgm``), and you want to display a subset of them.

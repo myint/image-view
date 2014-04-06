@@ -62,7 +62,7 @@ def rainbow_gradient(data, max_value):
 def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     """Load PGM and return pygame.Surface.
 
-    This is only needed for 16-bit Netpbm formats, which pygame does not
+    This is only needed for 16-bit PGM formats, which pygame does not
     support. Return None for non-16-bit PGMs.
 
     >>> pgm0 = load_pgm('test/16_bit_ascii.pgm')
