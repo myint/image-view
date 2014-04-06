@@ -105,7 +105,7 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
         # Ignore any junk at the end of the file.
         byte_array.fromstring(raw_data[:2 * size[0] * size[1]])
 
-        if sys.byteorder == 'little' and big_endian:
+        if sys.byteorder != ('big' if big_endian else 'little'):
             byte_array.byteswap()
     else:
         # This cannot happen since we would have raised an exception on not
