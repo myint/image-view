@@ -116,6 +116,26 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     return pygame.image.frombuffer(data, size, 'RGB')
 
 
+def load_image(filename, *args, **kwargs):
+    """Return pygame.Surface.
+
+    This uses "load_pgm()" for 16-bit PGM images.
+
+    >>> surface = load_image('test/python.png')
+    >>> surface.get_size()
+    (50, 65)
+
+    """
+    surface = load_pgm(filename, *args, **kwargs)
+    if not surface:
+        try:
+            surface = pygame.image.load(filename)
+        except pygame.error as exception:
+            raise SystemExit('{}: {}'.format(filename, exception))
+
+    return surface
+
+
 class Viewer(object):
 
     """Return draw function, which takes a image filename parameter.
@@ -138,15 +158,9 @@ class Viewer(object):
     def draw(self, image_filename):
         """Draw image."""
         if image_filename:
-            self.__image_surface = load_pgm(image_filename,
-                                            rgb_mapper=self.__rgb_mapper,
-                                            big_endian=self.__big_endian)
-            if not self.__image_surface:
-                try:
-                    self.__image_surface = pygame.image.load(image_filename)
-                except pygame.error as exception:
-                    raise SystemExit('{}: {}'.format(image_filename,
-                                                     exception))
+            self.__image_surface = load_image(image_filename,
+                                              rgb_mapper=self.__rgb_mapper,
+                                              big_endian=self.__big_endian)
 
             pygame.display.set_caption(os.path.basename(image_filename))
 
