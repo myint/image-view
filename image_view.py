@@ -59,7 +59,7 @@ def rainbow_gradient(data, max_value):
         yield b
 
 
-def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
+def load_pgm(filename, rgb_mapper=grayscale_gradient, little_endian=False):
     """Load PGM and return pygame.Surface.
 
     This is only needed for 16-bit PGM formats, which pygame does not
@@ -105,7 +105,7 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
         # Ignore any junk at the end of the file.
         byte_array.fromstring(raw_data[:2 * size[0] * size[1]])
 
-        if sys.byteorder != ('big' if big_endian else 'little'):
+        if sys.byteorder != ('little' if little_endian else 'big'):
             byte_array.byteswap()
     else:
         # This cannot happen since we would have raised an exception on not
@@ -153,7 +153,7 @@ class Viewer(object):
 
     """
 
-    def __init__(self, colorize=False, big_endian=True):
+    def __init__(self, colorize=False, little_endian=False):
         pygame.display.init()
         pygame.key.set_repeat(200)
 
@@ -161,14 +161,15 @@ class Viewer(object):
         self.__image_surface = None
         self.__rgb_mapper = (
             rainbow_gradient if colorize else grayscale_gradient)
-        self.__big_endian = big_endian
+        self.__little_endian = little_endian
 
     def draw(self, image_filename):
         """Draw image."""
         if image_filename:
-            self.__image_surface = load_image(image_filename,
-                                              rgb_mapper=self.__rgb_mapper,
-                                              big_endian=self.__big_endian)
+            self.__image_surface = load_image(
+                image_filename,
+                rgb_mapper=self.__rgb_mapper,
+                little_endian=self.__little_endian)
 
             pygame.display.set_caption(os.path.basename(image_filename))
 
@@ -199,7 +200,7 @@ def run_user_interface(args):
     index = 0
 
     viewer = Viewer(colorize=args.colorize,
-                    big_endian=not args.little_endian)
+                    little_endian=args.little_endian)
     viewer.draw(args.files[index])
 
     while True:
