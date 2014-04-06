@@ -29,11 +29,26 @@ Installation
 Usage
 =====
 
-::
+Typical usage::
 
     $ image-view captured-070*.pgm
 
 Use the left and right arrow keys to navigate through images.
+
+Options::
+
+    usage: image-view [-h] [--colorize] [--little-endian] [--version]
+                      files [files ...]
+
+    positional arguments:
+      files            paths to images
+
+    optional arguments:
+      -h, --help       show this help message and exit
+      --colorize       color 16-bit PGM images with a rainbow gradient
+      --little-endian  interpret 16-bit PGM images as little endian; this is the
+                       opposite of Netpbm (and ImageMagick)
+      --version        show program's version number and exit
 
 
 Example screenshot

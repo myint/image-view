@@ -199,7 +199,8 @@ def main():
                         help='color 16-bit PGM images with a rainbow gradient')
     parser.add_argument('--little-endian', action='store_true',
                         help='interpret 16-bit PGM images as little endian; '
-                             'this the opposite of Netpbm (and ImageMagick)')
+                             'this is the opposite of Netpbm '
+                             '(and ImageMagick)')
     parser.add_argument('--version', action='version',
                         version='%(prog)s ' + __version__)
     parser.add_argument('files', nargs='+',
