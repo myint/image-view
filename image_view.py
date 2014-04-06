@@ -116,7 +116,7 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, little_endian=False):
     return pygame.image.frombuffer(data, size, 'RGB')
 
 
-def load_image(filename, *args, **kwargs):
+def load_image(filename, **kwargs):
     """Return pygame.Surface.
 
     This uses "load_pgm()" for 16-bit PGM images.
@@ -134,7 +134,7 @@ def load_image(filename, *args, **kwargs):
     ...                pgm_binary1.get_at((0, j))[0]) <= 1
 
     """
-    surface = load_pgm(filename, *args, **kwargs)
+    surface = load_pgm(filename, **kwargs)
     if not surface:
         try:
             surface = pygame.image.load(filename)
