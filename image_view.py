@@ -63,7 +63,7 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     """Load PGM and return pygame.Surface.
 
     This is only needed for 16-bit Netpbm formats, which pygame does not
-    support.
+    support. Return None for non-16-bit PGMs.
 
     >>> pgm0 = load_pgm('test/16_bit_ascii.pgm')
     >>> pgm0.get_size()
@@ -78,6 +78,9 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     >>> pgm_binary.get_size()
     (20, 100)
 
+    >>> load_pgm('test/8_bit_binary.pgm') is None
+    True
+
     """
     with open(filename, mode='rb') as input_file:
         file_contents = input_file.read()
@@ -85,13 +88,15 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, big_endian=True):
     result = re.search(MAGIC_REGEX + 3 * NUMBER_REGEX,
                        file_contents)
     if not result:
-        raise SystemExit(
-            "'{}' is of of an unsupported image type".format(filename))
+        return None
 
     magic_id = result.group(1)
     size = (int(result.group(2)), int(result.group(3)))
     max_value = int(result.group(4))
     raw_data = file_contents[result.end():]
+
+    if max_value <= 255:
+        return None
 
     if magic_id == b'P2':
         byte_array = [int(value) for value in raw_data.split()]
@@ -133,12 +138,15 @@ class Viewer(object):
     def draw(self, image_filename):
         """Draw image."""
         if image_filename:
-            try:
-                self.__image_surface = pygame.image.load(image_filename)
-            except pygame.error:
-                self.__image_surface = load_pgm(image_filename,
-                                                rgb_mapper=self.__rgb_mapper,
-                                                big_endian=self.__big_endian)
+            self.__image_surface = load_pgm(image_filename,
+                                            rgb_mapper=self.__rgb_mapper,
+                                            big_endian=self.__big_endian)
+            if not self.__image_surface:
+                try:
+                    self.__image_surface = pygame.image.load(image_filename)
+                except pygame.error as exception:
+                    raise SystemExit('{}: {}'.format(image_filename,
+                                                     exception))
 
             pygame.display.set_caption(os.path.basename(image_filename))
 
