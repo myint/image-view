@@ -37,7 +37,8 @@ Typical usage::
 
     $ image-view captured-070*.pgm
 
-Use the left and right arrow keys to navigate through images.
+1. Use the left and right arrow keys to navigate through images.
+2. Use ``+``/``-`` keys to scale the image. Press ``0`` to reset.
 
 Options::
 
