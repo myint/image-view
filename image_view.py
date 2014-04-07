@@ -150,9 +150,14 @@ class Viewer(object):
 
     >>> viewer = Viewer()
     >>> viewer.draw('test/16_bit_ascii.pgm')
-    >>> viewer.scale_up()
     >>> viewer.resize((640, 480))
     >>> viewer.scale_down()
+    >>> viewer.draw('test/python.png')
+
+    The scale is capped once pygame throws and error.
+
+    >>> for _ in range(10):
+    ...     viewer.scale_up()
     >>> viewer.draw('test/python.png')
 
     """
@@ -176,22 +181,17 @@ class Viewer(object):
                 rgb_mapper=self.__rgb_mapper,
                 little_endian=self.__little_endian)
 
+            while self.__scale > 1:
+                try:
+                    self.__image_surface = _scale(self.__image_surface,
+                                                  self.__scale)
+                    break
+                except pygame.error:
+                    self.scale_down()
+
             pygame.display.set_caption('{}{}'.format(
                 os.path.basename(image_filename),
                 '' if self.__scale == 1 else ' ({}x)'.format(self.__scale)))
-
-            if self.__scale != 1:
-                actual_size = self.__image_surface.get_size()
-                for _ in range(2):
-                    try:
-                        self.__image_surface = pygame.transform.scale(
-                            self.__image_surface,
-                            (self.__scale * actual_size[0],
-                             self.__scale * actual_size[1]))
-                        break
-                    except pygame.error:
-                        self.scale_default()
-                        pygame.display.set_caption('Reset to default scale')
 
         if self.__image_surface:
             if not self.__surface:
@@ -209,7 +209,7 @@ class Viewer(object):
 
     def scale_up(self):
         """Scale the image up by two."""
-        self.__scale = min(32, self.__scale * 2)
+        self.__scale = min(1024, self.__scale * 2)
 
     def scale_down(self):
         """Scale the image down by two."""
@@ -225,6 +225,15 @@ class Viewer(object):
         if self.__image_surface:
             self.__surface.blit(self.__image_surface, (0, 0))
         pygame.display.flip()
+
+
+def _scale(image_surface, scale):
+    """Return scaled image."""
+    actual_size = image_surface.get_size()
+    return pygame.transform.scale(
+        image_surface,
+        (scale * actual_size[0],
+         scale * actual_size[1]))
 
 
 def run_user_interface(args):
