@@ -150,6 +150,10 @@ class Viewer(object):
 
     >>> viewer = Viewer()
     >>> viewer.draw('test/16_bit_ascii.pgm')
+    >>> viewer.scale_up()
+    >>> viewer.resize((640, 480))
+    >>> viewer.scale_down()
+    >>> viewer.draw('test/python.png')
 
     """
 
@@ -162,6 +166,7 @@ class Viewer(object):
         self.__rgb_mapper = (
             rainbow_gradient if colorize else grayscale_gradient)
         self.__little_endian = little_endian
+        self.__scale = 1
 
     def draw(self, image_filename):
         """Draw image."""
@@ -171,7 +176,22 @@ class Viewer(object):
                 rgb_mapper=self.__rgb_mapper,
                 little_endian=self.__little_endian)
 
-            pygame.display.set_caption(os.path.basename(image_filename))
+            pygame.display.set_caption('{}{}'.format(
+                os.path.basename(image_filename),
+                '' if self.__scale == 1 else ' ({}x)'.format(self.__scale)))
+
+            if self.__scale != 1:
+                actual_size = self.__image_surface.get_size()
+                for _ in range(2):
+                    try:
+                        self.__image_surface = pygame.transform.scale(
+                            self.__image_surface,
+                            (self.__scale * actual_size[0],
+                             self.__scale * actual_size[1]))
+                        break
+                    except pygame.error:
+                        self.scale_default()
+                        pygame.display.set_caption('Reset to default scale')
 
         if self.__image_surface:
             if not self.__surface:
@@ -182,17 +202,29 @@ class Viewer(object):
 
         self._draw()
 
+    def resize(self, size):
+        """Resize the window."""
+        self.__surface = pygame.display.set_mode(size, pygame.RESIZABLE)
+        self._draw()
+
+    def scale_up(self):
+        """Scale the image up by two."""
+        self.__scale = min(32, self.__scale * 2)
+
+    def scale_down(self):
+        """Scale the image down by two."""
+        self.__scale = max(1, self.__scale // 2)
+
+    def scale_default(self):
+        """Set the image to its default scale."""
+        self.__scale = 1
+
     def _draw(self):
         """Draw contents of window."""
         self.__surface.fill(BACKGROUND)
         if self.__image_surface:
             self.__surface.blit(self.__image_surface, (0, 0))
         pygame.display.flip()
-
-    def resize(self, size):
-        """Resize the window."""
-        self.__surface = pygame.display.set_mode(size, pygame.RESIZABLE)
-        self._draw()
 
 
 def run_user_interface(args):
@@ -219,6 +251,14 @@ def run_user_interface(args):
             elif event.key in [pygame.K_RIGHT, pygame.K_DOWN,
                                pygame.K_SPACE]:
                 index = min(len(args.files) - 1, index + 1)
+            elif event.unicode:
+                # Make sure "event.unicode" is not the empty string.
+                if event.unicode in '+=':
+                    viewer.scale_up()
+                elif event.unicode in '-_':
+                    viewer.scale_down()
+                elif event.unicode in '0':
+                    viewer.scale_default()
 
             viewer.draw(args.files[index])
 
