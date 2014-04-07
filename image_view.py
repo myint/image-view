@@ -195,16 +195,15 @@ class Viewer(object):
 
         if self.__image_surface:
             if not self.__surface:
-                self.__surface = pygame.display.set_mode(
+                self.__surface = _create_display(
                     (max(512, self.__image_surface.get_size()[0]),
-                     max(256, self.__image_surface.get_size()[1])),
-                    pygame.RESIZABLE)
+                     max(256, self.__image_surface.get_size()[1])))
 
         self._draw()
 
     def resize(self, size):
         """Resize the window."""
-        self.__surface = pygame.display.set_mode(size, pygame.RESIZABLE)
+        self.__surface = _create_display(size)
         self._draw()
 
     def scale_up(self):
@@ -225,6 +224,11 @@ class Viewer(object):
         if self.__image_surface:
             self.__surface.blit(self.__image_surface, (0, 0))
         pygame.display.flip()
+
+
+def _create_display(size):
+    """Return display surface."""
+    return pygame.display.set_mode(size, pygame.RESIZABLE)
 
 
 def _scale(image_surface, scale):
