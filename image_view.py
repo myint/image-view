@@ -19,8 +19,10 @@ __version__ = '0.4.1'
 
 
 BACKGROUND = (146, 146, 146)
-MAGIC_REGEX = br'\s*(P[25])\s*(?:#.*[\r\n])*'
-NUMBER_REGEX = br'\s*(\d+)\s*(?:#.*[\r\n])*'
+
+COMMENT_REGEX = br'#.*[\r\n]'
+MAGIC_REGEX = br'\s*(P[25])\s*(?:' + COMMENT_REGEX + br')*'
+NUMBER_REGEX = br'\s*(\d+)\s*(?:' + COMMENT_REGEX + br')*'
 
 
 def grayscale_gradient(data, max_value):
@@ -103,7 +105,7 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, little_endian=False):
     if magic_id == b'P2':
         byte_array = [
             int(value)
-            for value in re.sub(br'#[^\n]*', b'', raw_data).split()
+            for value in re.sub(COMMENT_REGEX, b' ', raw_data).split()
         ][:expected_length]
     elif magic_id == b'P5':
         byte_array = array.array('H')
