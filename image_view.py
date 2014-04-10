@@ -98,12 +98,15 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, little_endian=False):
     if max_value <= 255:
         return None
 
+    expected_length = size[0] * size[1]
+
     if magic_id == b'P2':
-        byte_array = [int(value) for value in raw_data.split()]
+        byte_array = [int(value)
+                      for value in raw_data.split()][:expected_length]
     elif magic_id == b'P5':
         byte_array = array.array('H')
         # Ignore any junk at the end of the file.
-        byte_array.fromstring(raw_data[:2 * size[0] * size[1]])
+        byte_array.fromstring(raw_data[:2 * expected_length])
 
         if sys.byteorder != ('little' if little_endian else 'big'):
             byte_array.byteswap()
@@ -111,6 +114,9 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, little_endian=False):
         # This cannot happen since we would have raised an exception on not
         # matching the regular expression.
         assert False
+
+    if len(byte_array) < expected_length:
+        raise pygame.error('file truncated')
 
     data = bytearray(rgb_mapper(byte_array, max_value))
     return pygame.image.frombuffer(data, size, 'RGB')
@@ -134,12 +140,12 @@ def load_image(filename, **kwargs):
     ...                pgm_binary1.get_at((0, j))[0]) <= 1
 
     """
-    surface = load_pgm(filename, **kwargs)
-    if not surface:
-        try:
+    try:
+        surface = load_pgm(filename, **kwargs)
+        if not surface:
             surface = pygame.image.load(filename)
-        except pygame.error as exception:
-            raise SystemExit('{}: {}'.format(filename, exception))
+    except pygame.error as exception:
+        raise SystemExit('{}: {}'.format(filename, exception))
 
     return surface
 
