@@ -101,8 +101,10 @@ def load_pgm(filename, rgb_mapper=grayscale_gradient, little_endian=False):
     expected_length = size[0] * size[1]
 
     if magic_id == b'P2':
-        byte_array = [int(value)
-                      for value in raw_data.split()][:expected_length]
+        byte_array = [
+            int(value)
+            for value in re.sub(br'#[^\n]*', b'', raw_data).split()
+        ][:expected_length]
     elif magic_id == b'P5':
         byte_array = array.array('H')
         # Ignore any junk at the end of the file.
